@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - /usr/src/app/node_modules
+      - .:/usr/src/app
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      RABBITMQ_USER: sjdonado
+      RABBITMQ_PASS: f8faf60a6676005066c721926b4d7da7
+    ports:
+      - 3000:3000
+    depends_on:
+      - rabbitMQ
+  rabbitMQ:
+    image: rabbitmq:3
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: sjdonado
+      RABBITMQ_DEFAULT_PASS: f8faf60a6676005066c721926b4d7da7
+    ports:
+      - 5672:5672
