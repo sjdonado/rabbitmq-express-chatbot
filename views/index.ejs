@@ -1,11 +1,32 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title>Chatbot</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      socket.on('message', function (msg) {
+        console.log(msg)
+        const node = document.createElement('p');
+        node.textContent = msg;
+        document.getElementById('messages').appendChild(node);
+      });
+      
+      function sendMessage() {
+        socket.emit('message', document.chat.msg.value);
+        return false;
+      }
+    </script>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <h1>Chatbot</h1>
+    <div id="messages"></div>
+    <form name="chat" onSubmit="return sendMessage()">
+      <label for="new-messag">New message:</label>
+      <input type="text" id="msg" name="new-messag">
+      <input type="submit" value="Submit">
+    </form>
   </body>
 </html>

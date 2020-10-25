@@ -5,17 +5,17 @@ services:
     build: .
     restart: unless-stopped
     volumes:
-      - /usr/src/app/node_modules
       - .:/usr/src/app
     environment:
       NODE_ENV: development
       PORT: 3000
-      RABBITMQ_URI: amqp://sjdonado:f8faf60a6676005066c721926b4d7da7@rabbitMQ:5672/chatbot
+      RABBITMQ_URI: amqp://sjdonado:f8faf60a6676005066c721926b4d7da7@rabbitmq:5672/chatbot
+      RABBITMQ_CLIENT_WS: ws://client:client@localhost:15675/ws
     ports:
       - 3000:3000
     depends_on:
-      - rabbitMQ
-  rabbitMQ:
+      - rabbitmq
+  rabbitmq:
     image: rabbitmq:3
     restart: unless-stopped
     environment:
