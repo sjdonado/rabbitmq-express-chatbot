@@ -5,9 +5,10 @@ WORKDIR /usr/src/app
 EXPOSE 3000
 
 COPY ./package.json ./
+COPY ./yarn.lock ./
 
 COPY . .
 
-RUN npm install
+RUN yarn
 
-CMD ["npm", "start"]
+CMD ["yarn", "start"]

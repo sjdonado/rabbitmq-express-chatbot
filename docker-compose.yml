@@ -10,8 +10,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      RABBITMQ_USER: sjdonado
-      RABBITMQ_PASS: f8faf60a6676005066c721926b4d7da7
+      RABBITMQ_URI: amqp://sjdonado:f8faf60a6676005066c721926b4d7da7@rabbitMQ:5672/chatbot
     ports:
       - 3000:3000
     depends_on:
@@ -22,5 +21,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: sjdonado
       RABBITMQ_DEFAULT_PASS: f8faf60a6676005066c721926b4d7da7
+      RABBITMQ_DEFAULT_VHOST: chatbot
     ports:
       - 5672:5672
