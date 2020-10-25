@@ -17,6 +17,7 @@ services:
       - 3000:3000
     depends_on:
       - rabbitmq
+      - redis
   rabbitmq:
     image: rabbitmq:3
     restart: unless-stopped

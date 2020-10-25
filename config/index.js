@@ -4,7 +4,7 @@ const config = {
   rabbitmq: {
     URI: process.env.RABBITMQ_URI,
     clientUri: process.env.RABBITMQ_CLIENT_WS,
-    queueName: 'mqtt-chatbot',
+    defaultQueue: 'main',
   },
   redisURI: process.env.REDIS_URI,
 };

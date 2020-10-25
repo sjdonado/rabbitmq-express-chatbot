@@ -16,6 +16,37 @@ a {
     width: 212px;
     height: 24px; }
 
+.nav {
+  display: flex;
+  align-items: center;
+  margin-bottom: 36px; }
+  .nav h3 {
+    margin-right: 12px; }
+  .nav .user-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 70%; }
+  .nav .room {
+    display: flex;
+    flex-direction: row;
+    width: 30%; }
+    .nav .room input {
+      margin-right: 6px; }
+
+.chat {
+  border-top: 0.5px solid grey;
+  margin-top: 24px;
+  padding-top: 12px; }
+
+.message {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px; }
+  .message p {
+    width: 85%;
+    margin: 4px; }
+
 .error {
   margin-top: 12px;
   color: red; }

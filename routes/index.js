@@ -1,13 +1,15 @@
 const router = require('express').Router();
 
-const { rabbitmq } = require('../config');
 const authentication = require('../middlewares/authentication');
 
-const { clientUri, queueName } = rabbitmq;
+const { rabbitmq } = require('../config');
 
 /* GET home page. */
 router.get('/', authentication, (req, res) => {
-  res.render('index', { queueName, clientUri });
+  res.render('index', {
+    username: req.session.username,
+    defaultQueue: rabbitmq.defaultQueue,
+  });
 });
 
 /* GET login page. */
