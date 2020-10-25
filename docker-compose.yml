@@ -9,6 +9,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
+      ORIGIN: http://localhost:3000
       SECRET: f282daa3f819c24c68fecfed2daa0905aa13470a
       RABBITMQ_URI: amqp://sjdonado:f8faf60a6676005066c721926b4d7da7@rabbitmq:5672/chatbot
       RABBITMQ_CLIENT_WS: ws://client:client@localhost:15675/ws
@@ -16,8 +17,21 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - rabbitmq
       - redis
+      - rabbitmq
+      - bot
+  bot:
+    build:
+      context: ./bot
+    restart: unless-stopped
+    volumes:
+      - ./bot:/usr/src/app
+    environment:
+      RABBITMQ_URI: amqp://bot:f8faf60a6676005066c721926b4d7da7@rabbitmq:5672/chatbot
+    ports:
+      - 3001:3001
+    depends_on:
+      - rabbitmq
   rabbitmq:
     image: rabbitmq:3
     restart: unless-stopped

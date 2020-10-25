@@ -7,7 +7,6 @@ let ch = null;
 
 const assertQueueOptions = {
   durable: false,
-  // autoDelete: true,
 };
 
 /**
@@ -21,7 +20,7 @@ const connect = () => amqp.connect(rabbitmq.URI)
     console.log('[amqp]::connected');
     return Promise.all([
       ch.assertQueue(rabbitmq.defaultQueue, assertQueueOptions),
-      ch.assertQueue(rabbitmq.botQueue, assertQueueOptions),
+      ch.assertQueue(rabbitmq.availableQueues, assertQueueOptions),
     ]);
   })
   .catch((err) => {
@@ -57,36 +56,12 @@ const publishToQueue = async (queueName, msg) => {
 const consumeQueue = async (queueName, callback) => {
   try {
     ch.consume(queueName, (msg) => {
-      const { message, username } = JSON.parse(msg.content.toString());
+      const message = msg.content.toString();
       console.log(`[amqp]::message: ${message}`);
-      callback({ message, username });
+      callback(message);
     }, { noAck: true });
   } catch (err) {
     callback(err);
-  }
-};
-
-const queues = new Set();
-/**
- * Check if queue exists and consume it
- * @param {SocketIO} socket
- * @param {String} queueName
- */
-const newAvailableQueue = async (socket, queueName) => {
-  try {
-    if (!queues.has(queueName)) {
-      queues.add(queueName);
-      await ch.assertQueue(queueName, assertQueueOptions);
-      consumeQueue(queueName, ({ message, username }) => {
-        console.log('MESSAGE', message);
-        if (message[0] === '/') {
-          publishToQueue(rabbitmq.botQueue, message);
-        }
-        socket.to(queueName).emit('message', { message, username });
-      });
-    }
-  } catch (err) {
-    console.log(err);
   }
 };
 
@@ -99,5 +74,4 @@ module.exports = {
   connect,
   publishToQueue,
   consumeQueue,
-  newAvailableQueue,
 };

@@ -13,7 +13,7 @@ const RedisStore = require('connect-redis')(session);
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
-const { secret, redisURI } = require('./config');
+const { secret, origin, redisURI } = require('./config');
 
 const app = express();
 
@@ -22,7 +22,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin,
 }));
 
 const redisClient = redis.createClient(redisURI);

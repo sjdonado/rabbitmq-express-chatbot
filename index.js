@@ -10,24 +10,16 @@ const { port } = require('./config');
 const {
   connect,
   publishToQueue,
-  consumeQueue,
+  newAvailableQueue,
 } = require('./services/rabbitmq');
-
-const queues = new Set();
-const validateAndConsumeQueue = (socket, queueName) => {
-  if (!queues.has(queueName)) {
-    queues.add(queueName);
-    consumeQueue(queueName, (newMessage) => socket.to(queueName).emit('message', newMessage));
-  }
-};
 
 connect()
   .then(() => {
     io.on('connection', async (socket) => {
-      socket.on('join', (queueName) => {
+      socket.on('join', async (queueName) => {
         socket.leaveAll();
         socket.join(queueName);
-        validateAndConsumeQueue(socket, queueName);
+        await newAvailableQueue(socket, queueName);
       });
       socket.on('message', ({ queueName, message, username }) => {
         publishToQueue(queueName, JSON.stringify({ message, username }));
