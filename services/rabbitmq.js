@@ -5,7 +5,10 @@ const { rabbitmq } = require('../config');
 let attempts = 0;
 let ch = null;
 
-const connect = () => amqp.connect(rabbitmq.uri)
+/**
+ * Connect to rabbitmq
+ */
+const connect = () => amqp.connect(rabbitmq.URI)
   .then((conn) => conn.createChannel())
   .then((channel) => {
     ch = channel;
@@ -23,12 +26,20 @@ const connect = () => amqp.connect(rabbitmq.uri)
     }, 3000);
   });
 
+/**
+ * Publish message to rabbitmq queue
+ * @param {String} msg
+ */
 const publishToQueue = async (msg) => {
   if (ch) {
     ch.sendToQueue(rabbitmq.queueName, Buffer.from(msg));
   }
 };
 
+/**
+ * Consume the rabbitmq queue
+ * @param {Function} callback
+ */
 const consumeQueue = async (callback) => ch.consume(rabbitmq.queueName, (msg) => {
   const parsedMessage = msg.content.toString();
   console.log(`[amqp]::message: ${parsedMessage}`);

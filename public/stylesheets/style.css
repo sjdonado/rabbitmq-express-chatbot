@@ -5,4 +5,19 @@ body {
 a {
   color: #00B7FF; }
 
+.login {
+  display: flex;
+  flex-direction: column; }
+  .login input {
+    margin-bottom: 12px;
+    width: 200px;
+    height: 16px; }
+  .login input[type="submit"] {
+    width: 212px;
+    height: 24px; }
+
+.error {
+  margin-top: 12px;
+  color: red; }
+
 /*# sourceMappingURL=style.css.map */

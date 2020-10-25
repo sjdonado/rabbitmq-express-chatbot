@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chatbot</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Login</h1>
+    <form class="login" action="/users/login" method="POST">
+      <label for="username">Username:</label>
+      <input type="text" name="username">
+      <label for="password">Password:</label>
+      <input type="password" name="password">
+      <input type="submit" value="Submit">
+    </form>
+    <% if (error) { %>
+      <span class="error"><%= error %></span>
+    <% } %>
+  </body>
+</html>

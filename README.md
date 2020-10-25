@@ -4,7 +4,7 @@
 docker-compose up
 ```
 
-## Setup
+## Create an user
 ```bash
-sh rabbitmq-setup.sh
+curl --header "Content-Type: application/json" --request POST --data '{"username":"sjdonado","password":"12345"}' http://localhost:3000/users
 ```

@@ -1,12 +1,19 @@
-const createError = require('http-errors');
-const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
+const createError = require('http-errors');
+
+const express = require('express');
+const cors = require('cors');
 const logger = require('morgan');
+const redis = require('redis');
+const session = require('express-session');
 const sassMiddleware = require('node-sass-middleware');
+
+const RedisStore = require('connect-redis')(session);
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+
+const { secret, redisURI } = require('./config');
 
 const app = express();
 
@@ -14,14 +21,28 @@ const app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+}));
+
+const redisClient = redis.createClient(redisURI);
+
+app.use(session({
+  secret,
+  name: 'chatbot',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false },
+  store: new RedisStore({ client: redisClient }),
+}));
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(sassMiddleware({
   src: path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public'),
-  indentedSyntax: true, // true = .sass and false = .scss
+  indentedSyntax: false,
   sourceMap: true,
 }));
 app.use(express.static(path.join(__dirname, 'public')));

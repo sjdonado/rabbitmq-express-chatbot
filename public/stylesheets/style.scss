@@ -1,0 +1,28 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  input {
+    margin-bottom: 12px;
+    width: 200px;
+    height: 16px;
+  }
+  input[type="submit"] {
+    width: 212px;
+    height: 24px;
+  }
+}
+
+.error {
+  margin-top: 12px;
+  color: red;
+}
+
