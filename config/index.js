@@ -5,8 +5,8 @@ const config = {
   rabbitmq: {
     URI: process.env.RABBITMQ_URI,
     clientUri: process.env.RABBITMQ_CLIENT_WS,
+    botQueue: process.env.BOT_QUEUE,
     defaultQueue: 'main',
-    botQueue: 'botQueue_f8f219af60a66760050667',
   },
   redisURI: process.env.REDIS_URI,
 };

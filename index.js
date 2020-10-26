@@ -10,7 +10,7 @@ const { port } = require('./config');
 const {
   connect,
   publishToQueue,
-  newAvailableQueue,
+  createAndConsumeQueue,
 } = require('./services/rabbitmq');
 
 connect()
@@ -20,15 +20,20 @@ connect()
       socket.on('join', (queueName) => {
         socket.leaveAll();
         socket.join(queueName);
-        newAvailableQueue(ch, queueName, (newMessage) => {
-          console.log('[socketio]::emit:', queueName, newMessage);
-          socket.to(queueName).emit('message', newMessage);
+        socket.emit('joined');
+        createAndConsumeQueue(ch, queueName, (err, newMessage) => {
+          if (!err) {
+            console.log('[socketio]::emit:', queueName, newMessage);
+            io.to(queueName).emit('message', newMessage);
+          }
         });
       });
       socket.on('message', ({ queueName, message, username }) => {
         publishToQueue(ch, queueName, JSON.stringify({ message, username }));
       });
     });
+  }).catch((err) => {
+    console.log(err);
   });
 
 server.listen(port, () => {

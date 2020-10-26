@@ -1,6 +1,6 @@
 const Datastore = require('nedb');
 
-const db = new Datastore({ filename: '../db/users.db' });
+const db = new Datastore({ filename: `${__dirname}/../db/users.db` });
 
 db.loadDatabase((err) => {
   if (err) {

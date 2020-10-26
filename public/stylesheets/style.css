@@ -26,11 +26,11 @@ a {
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 65%; }
+    width: 60%; }
   .nav .room {
     display: flex;
     flex-direction: row;
-    width: 35%; }
+    width: 40%; }
     .nav .room input[type='text'] {
       width: 100px; }
     .nav .room input {
@@ -54,6 +54,10 @@ a {
   color: red; }
 
 #current-room {
+  margin-right: 12px; }
+
+#status {
+  font-weight: bold;
   margin-right: 12px; }
 
 /*# sourceMappingURL=style.css.map */

@@ -11,7 +11,7 @@ docker-compose up
 Run `docker-compose build`
 
 - RabbitMQ setup
-Run `sh rabbitmq-setup.sh`, then `docker-compose up`
+Run `sh rabbitmq-setup.sh`
 
 - Run all
 ```
@@ -38,11 +38,15 @@ rabbitmq_1  | 2020-10-26 13:45:03.667 [info] <0.706.0> connection <0.706.0> (192
 bot_1       | [amqp]::connected
 ```
 
-- Create two users
+- Create an user
 ```bash
-curl --header "Content-Type: application/json" --request POST --data '{"username":"sjdonado","password":"12345"}' http://localhost:3000/users
-curl --header "Content-Type: application/json" --request POST --data '{"username":"test","password":"12345"}' http://localhost:3000/users
+curl --header "Content-Type: application/json" --request POST --data '{"username":"test_1","password":"12345"}' http://localhost:3000/users
 ```
+
+- Login
+**Dummy users:**
+- { username: 'sjdonado', password: '12345' }
+- { username: 'test', password: '12345 }
 
 ## Examples
 - User 1 window

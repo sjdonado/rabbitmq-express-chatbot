@@ -8,14 +8,30 @@
       document.addEventListener('DOMContentLoaded', function() {
         const socket = io();
   
+        const status = document.getElementById('status');
         const messages = document.getElementById('messages');
         let currentRoom = '<%= defaultQueue %>';
 
+        function joinToRoom(init = false) {
+          status.innerText = 'Joining...';
+          if (!init) {
+            const newRoom = document.getElementById('new-room');
+            currentRoom = newRoom.value.split(' ')[0].toLowerCase();
+            newRoom.value = '';
+          }
+          document.getElementById('current-room').innerHTML = `Current room: <b>${currentRoom}</b>`;
+          socket.emit('join', currentRoom);
+          messages.innerHTML = '';
+        }
+
         socket.on('connect', function() {
-          console.log('connected');
           joinToRoom(true);
-        })
-  
+        });
+
+        socket.on('joined', function() {
+          status.innerText = 'online';
+        });
+
         socket.on('message', function ({ message, username }) {
           const node = document.createElement('span');
           node.className = 'message';
@@ -43,24 +59,15 @@
         document.getElementById('chat').addEventListener('submit', function(e) {
           e.preventDefault();
           const input = document.getElementById('msg');
-          socket.emit('message', {
-            queueName: currentRoom,
-            message: input.value,
-            username: '<%= username %>'
-          });
-          input.value = '';
-        });
-
-        function joinToRoom(init = false) {
-          if (!init) {
-            const newRoom = document.getElementById('new-room');
-            currentRoom = newRoom.value.split(' ')[0].toLowerCase();
-            newRoom.value = '';
+          if (input.value.length > 0) {
+            socket.emit('message', {
+              queueName: currentRoom,
+              message: input.value,
+              username: '<%= username %>'
+            });
+            input.value = '';
           }
-          document.getElementById('current-room').innerHTML = `Current room: <b>${currentRoom}</b>`;
-          socket.emit('join', currentRoom);
-          messages.innerHTML = '';
-        }
+        });
       });
     </script>
   </head>
@@ -72,6 +79,7 @@
         <a href="/users/logout">logout</a>
       </div>
       <form id="join-to-room" class="room">
+        <span id="status"></span>
         <span id="current-room"></span>
         <label for="room-input">Join to room:</label>
         <input type="text" id="new-room" name="room-input">

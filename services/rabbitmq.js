@@ -25,11 +25,10 @@ const connect = () => new Promise((res, rej) => {
       }
     })
     .catch((err) => {
-      console.log(err.message);
       if (attempts < 5) {
         setTimeout(() => {
           attempts += 1;
-          console.log(`[amqp]::reconnecting: attempts ${attempts}/5`);
+          console.log(`[amqp]::reconnecting: attempts ${attempts}/5`, err.message);
           res(connect());
         }, 3500);
       } else {
@@ -59,12 +58,12 @@ const publishToQueue = async (ch, queueName, msg) => {
  * @param {Function} callback
  * @returns {Object} { message: String, username: String }
  */
-const consumeQueue = async (ch, queueName, callback) => {
+const consumeQueue = (ch, queueName, callback) => {
   try {
     ch.consume(queueName, (msg) => {
+      console.log('[amqp]::message:', msg.content.toString());
       const { message, username } = JSON.parse(msg.content.toString());
-      console.log(`[amqp]::message: ${message}`);
-      callback({ message, username });
+      callback(false, { message, username });
     }, { noAck: true });
   } catch (err) {
     callback(err);
@@ -79,19 +78,32 @@ const queues = new Set();
  * @param {String} queueName
  * @param {Function} callback {{ username: String, message: String }}
  */
-const newAvailableQueue = (ch, queueName, callback) => {
+const createAndConsumeQueue = (ch, queueName, callback) => {
   if (!queues.has(queueName)) {
     queues.add(queueName);
     ch.assertQueue(queueName, assertQueueOptions)
       .then(() => {
-        consumeQueue(ch, queueName, ({ message, username }) => {
-          if (message[0] === '/') {
-            publishToQueue(rabbitmq.botQueue, JSON.stringify({ queueName, username, message }));
+        consumeQueue(ch, queueName, (err, { message, username }) => {
+          if (err) {
+            callback(err);
+          } else {
+            if (message[0] === '/') {
+              publishToQueue(ch, rabbitmq.botQueue, JSON.stringify({
+                queueName,
+                username,
+                message,
+              }));
+            }
+            callback(false, { username, message });
           }
-          callback({ username, message });
         });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        callback(err);
+      });
+  } else {
+    callback(true);
   }
 };
 
@@ -106,5 +118,5 @@ module.exports = {
   connect,
   publishToQueue,
   consumeQueue,
-  newAvailableQueue,
+  createAndConsumeQueue,
 };

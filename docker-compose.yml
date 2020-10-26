@@ -14,6 +14,7 @@ services:
       RABBITMQ_URI: amqp://sjdonado:f8faf60a6676005066c721926b4d7da7@rabbitmq:5672/chatbot
       RABBITMQ_CLIENT_WS: ws://client:client@localhost:15675/ws
       REDIS_URI: redis://redis:6379
+      BOT_QUEUE: botqueue_f8f219af60a66760050667
     ports:
       - 3000:3000
     depends_on:
@@ -27,7 +28,9 @@ services:
     volumes:
       - ./bot:/usr/src/app
     environment:
+      NODE_ENV: development
       RABBITMQ_URI: amqp://bot:f8faf60a6676005066c721926b4d7da7@rabbitmq:5672/chatbot
+      BOT_QUEUE: botqueue_f8f219af60a66760050667
     ports:
       - 3001:3001
     depends_on:

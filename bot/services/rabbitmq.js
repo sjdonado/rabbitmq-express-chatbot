@@ -26,11 +26,10 @@ const connect = () => new Promise((res, rej) => {
       }
     })
     .catch((err) => {
-      console.log(err.message);
       if (attempts < 5) {
         setTimeout(() => {
           attempts += 1;
-          console.log(`[amqp]::reconnecting: attempts ${attempts}/5`);
+          console.log(`[amqp]::reconnecting: attempts ${attempts}/5`, err.message);
           res(connect());
         }, 3500);
       } else {
@@ -60,12 +59,12 @@ const publishToQueue = async (ch, queueName, msg) => {
  * @param {Function} callback
  * @returns {Object} { message: String, username: String }
  */
-const consumeQueue = async (ch, queueName, callback) => {
+const consumeQueue = (ch, queue, callback) => {
   try {
-    ch.consume(queueName, (msg) => {
-      const { message, username } = JSON.parse(msg.content.toString());
-      console.log(`[amqp]::message: ${message}`);
-      callback({ message, username });
+    ch.consume(queue, (msg) => {
+      console.log('[amqp]::message:', msg.content.toString());
+      const { queueName, message } = JSON.parse(msg.content.toString());
+      callback(false, { queueName, message });
     }, { noAck: true });
   } catch (err) {
     callback(err);

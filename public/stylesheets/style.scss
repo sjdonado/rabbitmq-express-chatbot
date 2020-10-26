@@ -32,12 +32,12 @@ a {
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 65%;
+    width: 60%;
   }
   .room {
     display: flex;
     flex-direction: row;
-    width: 35%;
+    width: 40%;
     input[type='text'] {
       width: 100px;
     }
@@ -70,5 +70,9 @@ a {
 
 #current-room {
   margin-right: 12px;
-  
+}
+
+#status {
+  font-weight: bold;
+  margin-right: 12px;
 }
