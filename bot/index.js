@@ -1,10 +1,38 @@
-const { connect, consumeQueue } = require('./services/rabbitmq');
+const { connect, consumeQueue, publishToQueue } = require('./services/rabbitmq');
+const { fetchStockPice } = require('./services/stooq');
 
 const { rabbitmq } = require('./config');
 
 connect()
   .then(() => {
-    consumeQueue(rabbitmq.botQueue, (newMessage) => {
-      console.log(newMessage);
+    consumeQueue(rabbitmq.botQueue, async (newMessage) => {
+      const { queueName, message } = JSON.parse(newMessage);
+      const username = 'bot';
+
+      const match = message.match(/\/(\w+)=?(.*)/);
+      if (match && match.length >= 2) {
+        console.log('[bot]:', match);
+        let response;
+        switch (match[1]) {
+          case 'stock':
+            if (match[2]) {
+              const stockPrice = await fetchStockPice(match[2]);
+              response = `${match[2].toUpperCase()} quote is ${stockPrice} per share`;
+            } else {
+              response = 'Stock code not found, try again: /stock=stock_code';
+            }
+            publishToQueue(queueName, JSON.stringify({
+              username,
+              message: response,
+            }));
+            break;
+          default:
+            publishToQueue(queueName, JSON.stringify({
+              username,
+              message: `Command: /${match[1]} not found, please try again. (ie: /stock)`,
+            }));
+            break;
+        }
+      }
     });
   });

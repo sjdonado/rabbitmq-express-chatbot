@@ -22,12 +22,16 @@
           node.className = 'message';
   
           const text = document.createElement('p');
-          text.textContent = `${username}: ${message}`;
+          text.innerHTML = `<b>${username}:</b> ${message}`;
           node.appendChild(text);
   
           const metadata = document.createElement('span');
           metadata.textContent = new Date().toLocaleTimeString();
           node.appendChild(metadata);
+
+          if (messages.childNodes.length > 50) {
+            messages.removeChild(messages.childNodes[0]);
+          }
   
           messages.appendChild(node);
         });

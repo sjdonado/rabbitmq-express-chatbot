@@ -78,10 +78,10 @@ const newAvailableQueue = async (socket, queueName) => {
       queues.add(queueName);
       await ch.assertQueue(queueName, assertQueueOptions);
       consumeQueue(queueName, ({ message, username }) => {
-        console.log('MESSAGE', message);
         if (message[0] === '/') {
-          publishToQueue(rabbitmq.botQueue, message);
+          publishToQueue(rabbitmq.botQueue, JSON.stringify({ queueName, username, message }));
         }
+        console.log('[amqp]::emit:socketio:', message);
         socket.to(queueName).emit('message', { message, username });
       });
     }
