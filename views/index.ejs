@@ -9,12 +9,11 @@
         const socket = io();
   
         const messages = document.getElementById('messages');
-        const room = document.getElementById('room');
-        room.value = '<%= defaultQueue %>';
+        let currentRoom = '<%= defaultQueue %>';
 
         socket.on('connect', function() {
           console.log('connected');
-          joinToRoom();
+          joinToRoom(true);
         })
   
         socket.on('message', function ({ message, username }) {
@@ -45,15 +44,21 @@
           e.preventDefault();
           const input = document.getElementById('msg');
           socket.emit('message', {
-            queueName: room.value,
+            queueName: currentRoom,
             message: input.value,
             username: '<%= username %>'
           });
           input.value = '';
         });
 
-        function joinToRoom() {
-          socket.emit('join', room.value);
+        function joinToRoom(init = false) {
+          if (!init) {
+            const newRoom = document.getElementById('new-room');
+            currentRoom = newRoom.value.split(' ')[0].toLowerCase();
+            newRoom.value = '';
+          }
+          document.getElementById('current-room').innerHTML = `Current room: <b>${currentRoom}</b>`;
+          socket.emit('join', currentRoom);
           messages.innerHTML = '';
         }
       });
@@ -67,8 +72,9 @@
         <a href="/users/logout">logout</a>
       </div>
       <form id="join-to-room" class="room">
-        <label for="room-input">Room:</label>
-        <input type="text" id="room" name="room-input">
+        <span id="current-room"></span>
+        <label for="room-input">Join to room:</label>
+        <input type="text" id="new-room" name="room-input">
         <input type="submit" value="Join">
       </form>
     </div>

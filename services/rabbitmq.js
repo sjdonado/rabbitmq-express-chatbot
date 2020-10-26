@@ -3,46 +3,50 @@ const amqp = require('amqplib');
 const { rabbitmq } = require('../config');
 
 let attempts = 0;
-let ch = null;
+let currentChannel;
 
 const assertQueueOptions = {
   durable: false,
-  // autoDelete: true,
 };
 
 /**
  * Connect to rabbitmq
  * @returns {Promise}
  */
-const connect = () => amqp.connect(rabbitmq.URI)
-  .then((conn) => conn.createChannel())
-  .then((channel) => {
-    ch = channel;
-    console.log('[amqp]::connected');
-    return Promise.all([
-      ch.assertQueue(rabbitmq.defaultQueue, assertQueueOptions),
-      ch.assertQueue(rabbitmq.botQueue, assertQueueOptions),
-    ]);
-  })
-  .catch((err) => {
-    console.log(err.message);
-    setTimeout(() => {
-      attempts += 1;
-      console.log(`[amqp]::reconnecting: attempts ${attempts}/5`);
-      connect();
-    }, 3500);
-  });
+const connect = () => new Promise((res, rej) => {
+  amqp.connect(rabbitmq.URI)
+    .then((conn) => conn.createChannel())
+    .then((channel) => {
+      currentChannel = channel;
+      if (!channel) {
+        res(connect());
+      } else {
+        res(channel);
+      }
+    })
+    .catch((err) => {
+      console.log(err.message);
+      if (attempts < 5) {
+        setTimeout(() => {
+          attempts += 1;
+          console.log(`[amqp]::reconnecting: attempts ${attempts}/5`);
+          res(connect());
+        }, 3500);
+      } else {
+        rej(err);
+      }
+    });
+});
 
 /**
  * Publish message to rabbitmq queue
+ * @param {Object} channel
  * @param {String} queueName
  * @param {String} msg
  */
-const publishToQueue = async (queueName, msg) => {
+const publishToQueue = async (ch, queueName, msg) => {
   try {
-    if (ch) {
-      ch.sendToQueue(queueName, Buffer.from(msg));
-    }
+    ch.sendToQueue(queueName, Buffer.from(msg));
   } catch (err) {
     console.log(err);
   }
@@ -50,11 +54,12 @@ const publishToQueue = async (queueName, msg) => {
 
 /**
  * Consume the rabbitmq queue
+ * @param {Object} channel
  * @param {String} queueName
  * @param {Function} callback
  * @returns {Object} { message: String, username: String }
  */
-const consumeQueue = async (queueName, callback) => {
+const consumeQueue = async (ch, queueName, callback) => {
   try {
     ch.consume(queueName, (msg) => {
       const { message, username } = JSON.parse(msg.content.toString());
@@ -69,30 +74,32 @@ const consumeQueue = async (queueName, callback) => {
 const queues = new Set();
 /**
  * Check if queue exists and consume it
+ * @param {Object} channel
  * @param {SocketIO} socket
  * @param {String} queueName
+ * @param {Function} callback {{ username: String, message: String }}
  */
-const newAvailableQueue = async (socket, queueName) => {
-  try {
-    if (!queues.has(queueName)) {
-      queues.add(queueName);
-      await ch.assertQueue(queueName, assertQueueOptions);
-      consumeQueue(queueName, ({ message, username }) => {
-        if (message[0] === '/') {
-          publishToQueue(rabbitmq.botQueue, JSON.stringify({ queueName, username, message }));
-        }
-        console.log('[amqp]::emit:socketio:', message);
-        socket.to(queueName).emit('message', { message, username });
-      });
-    }
-  } catch (err) {
-    console.log(err);
+const newAvailableQueue = (ch, queueName, callback) => {
+  if (!queues.has(queueName)) {
+    queues.add(queueName);
+    ch.assertQueue(queueName, assertQueueOptions)
+      .then(() => {
+        consumeQueue(ch, queueName, ({ message, username }) => {
+          if (message[0] === '/') {
+            publishToQueue(rabbitmq.botQueue, JSON.stringify({ queueName, username, message }));
+          }
+          callback({ username, message });
+        });
+      })
+      .catch((err) => console.log(err));
   }
 };
 
 process.on('exit', () => {
-  ch.close();
-  console.log('Closing rabbitmq channel');
+  if (currentChannel) {
+    currentChannel.close();
+    console.log('Closing rabbitmq channel');
+  }
 });
 
 module.exports = {

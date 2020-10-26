@@ -14,15 +14,19 @@ const {
 } = require('./services/rabbitmq');
 
 connect()
-  .then(() => {
-    io.on('connection', async (socket) => {
-      socket.on('join', async (queueName) => {
+  .then((ch) => {
+    console.log('[amqp]::connected');
+    io.on('connection', (socket) => {
+      socket.on('join', (queueName) => {
         socket.leaveAll();
         socket.join(queueName);
-        await newAvailableQueue(socket, queueName);
+        newAvailableQueue(ch, queueName, (newMessage) => {
+          console.log('[socketio]::emit:', queueName, newMessage);
+          socket.to(queueName).emit('message', newMessage);
+        });
       });
       socket.on('message', ({ queueName, message, username }) => {
-        publishToQueue(queueName, JSON.stringify({ message, username }));
+        publishToQueue(ch, queueName, JSON.stringify({ message, username }));
       });
     });
   });

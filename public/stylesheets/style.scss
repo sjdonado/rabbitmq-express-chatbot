@@ -32,14 +32,17 @@ a {
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 70%;
+    width: 65%;
   }
   .room {
     display: flex;
     flex-direction: row;
-    width: 30%;
+    width: 35%;
+    input[type='text'] {
+      width: 100px;
+    }
     input {
-      margin-right: 6px;
+      margin-left: 6px;
     }
   }
 }
@@ -63,4 +66,9 @@ a {
 .error {
   margin-top: 12px;
   color: red;
+}
+
+#current-room {
+  margin-right: 12px;
+  
 }
