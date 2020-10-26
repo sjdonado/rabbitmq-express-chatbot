@@ -16,7 +16,7 @@ const fetchStockPice = (stock) => new Promise((res, rej) => {
         res(parse(data[1][6]));
       });
     });
-  }).on('error', ({ message }) => { // Handle errors
+  }).on('error', ({ message }) => {
     fs.unlink(filename);
     rej(message);
   });

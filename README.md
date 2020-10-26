@@ -6,7 +6,16 @@
 docker-compose up
 ```
 
-## Setup
+## Dummy prod
+- Run `sh prod-setup.sh`
+- Login
+Go to http://localhost:3000 and login it with a dummy user:
+```json
+{ username: 'sjdonado', password: '12345' }
+{ username: 'test', password: '12345' }
+```
+
+## Development setup
 - Docker setup
 Run `docker-compose build`
 
@@ -42,11 +51,6 @@ bot_1       | [amqp]::connected
 ```bash
 curl --header "Content-Type: application/json" --request POST --data '{"username":"test_1","password":"12345"}' http://localhost:3000/users
 ```
-
-- Login
-**Dummy users:**
-- { username: 'sjdonado', password: '12345' }
-- { username: 'test', password: '12345 }
 
 ## Examples
 - User 1 window
