@@ -14,7 +14,9 @@ router.get('/', authentication, (req, res) => {
 
 /* GET login page. */
 router.get('/login', (req, res) => {
-  res.render('login', { error: null });
+  res.render('login', {
+    error: null,
+  });
 });
 
 module.exports = router;

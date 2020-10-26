@@ -5,10 +5,10 @@ const express = require('express');
 const cors = require('cors');
 const logger = require('morgan');
 const redis = require('redis');
-const session = require('express-session');
+const Session = require('express-session');
 const sassMiddleware = require('node-sass-middleware');
 
-const RedisStore = require('connect-redis')(session);
+const RedisStore = require('connect-redis')(Session);
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -27,15 +27,16 @@ app.use(cors({
 
 const redisClient = redis.createClient(redisURI);
 
-app.use(session({
+const session = Session({
   secret,
   name: 'chatbot',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false },
   store: new RedisStore({ client: redisClient }),
-}));
+});
 
+app.use(session);
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -66,4 +67,7 @@ app.use((err, req, res) => {
   res.render('error');
 });
 
-module.exports = app;
+module.exports = {
+  app,
+  session,
+};

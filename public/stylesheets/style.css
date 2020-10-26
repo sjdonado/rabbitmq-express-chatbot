@@ -18,22 +18,24 @@ a {
 
 .nav {
   display: flex;
+  justify-content: center;
   align-items: center;
   margin-bottom: 36px; }
-  .nav h3 {
-    margin-right: 12px; }
   .nav .user-info {
+    flex: 4;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    width: 60%; }
-  .nav .room {
+    align-items: center; }
+    .nav .user-info h3 {
+      margin-right: 12px; }
+  .nav #join-to-room {
+    flex: 6;
     display: flex;
     flex-direction: row;
-    width: 40%; }
-    .nav .room input[type='text'] {
+    justify-content: flex-end; }
+    .nav #join-to-room input[type='text'] {
       width: 100px; }
-    .nav .room input {
+    .nav #join-to-room input {
       margin-left: 6px; }
 
 .chat {

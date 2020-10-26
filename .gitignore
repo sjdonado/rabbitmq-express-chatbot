@@ -61,3 +61,4 @@ typings/
 .next
 
 bot/tmp/*
+db/*.test.db

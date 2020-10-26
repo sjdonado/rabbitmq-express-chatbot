@@ -30,7 +30,7 @@ const connect = () => new Promise((res, rej) => {
           attempts += 1;
           console.log(`[amqp]::reconnecting: attempts ${attempts}/5`, err.message);
           res(connect());
-        }, 3500);
+        }, 4000);
       } else {
         rej(err);
       }

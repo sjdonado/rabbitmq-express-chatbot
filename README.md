@@ -1,18 +1,25 @@
 # RabbitMQ chatbot
 
-## How to run?
+<div align="center">
+  <img src="demo.gif" alt="Demo" width="100%" />
+</div>
 
-```bash
-docker-compose up
-```
+
+## Requeriments
+- Docker
 
 ## Dummy prod
 - Run `sh prod-setup.sh`
-- Login
-Go to http://localhost:3000 and login it with a dummy user:
+- Go to http://localhost:3000 and login it with a dummy user:
 ```json
-{ username: 'sjdonado', password: '12345' }
-{ username: 'test', password: '12345' }
+[
+  { "username": "sjdonado", "password": "12345" },
+  { "username": "test", "password": "12345" }
+]
+```
+- Run tests
+```bash
+docker-compose -f docker-compose.prod.yml run --rm app_prod npm test
 ```
 
 ## Development setup
@@ -52,13 +59,7 @@ bot_1       | [amqp]::connected
 curl --header "Content-Type: application/json" --request POST --data '{"username":"test_1","password":"12345"}' http://localhost:3000/users
 ```
 
-## Examples
-- User 1 window
-<div align="center">
-  <img src="example-1.png" alt="User 1 window" width="100%" />
-</div>
-
-- User 2 window
-<div align="center">
-  <img src="example-2.png" alt="User 2 window" width="100%" />
-</div>
+- Run tests
+```bash
+docker-compose run --rm app yarn test
+```
